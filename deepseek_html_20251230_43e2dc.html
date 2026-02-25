@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Pathfinder: Code & Conquer - Lessons</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Cute Theme */
+            --cute-primary: #ff6b9d;
+            --cute-secondary: #ffc8dd;
+            --cute-accent: #a2d2ff;
+            --cute-bg: #fff9fb;
+            --cute-text: #333;
+            --cute-card: #ffffff;
+            --cute-border: #ffc8dd;
+            --cute-success: #4CAF50;
+            --cute-warning: #FF9800;
+            --cute-danger: #F44336;
+            
+            /* Deadly Theme */
+            --deadly-primary: #ff4655;
+            --deadly-secondary: #1a1a2e;
+            --deadly-accent: #00ff9d;
+            --deadly-bg: #0d0d15;
+            --deadly-text: #ffffff;
+            --deadly-card: #1a1a2e;
+            --deadly-border: #333;
+            --deadly-success: #00ff9d;
+            --deadly-warning: #ffd166;
+            --deadly-danger: #ff4655;
+            
+            /* Common */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .cute-theme {
+            background-color: var(--cute-bg);
+            color: var(--cute-text);
+        }
+
+        .deadly-theme {
+            background-color: var(--deadly-bg);
+            color: var(--deadly-text);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar.cute {
+            background: white;
+            border-bottom: 3px solid var(--cute-primary);
+        }
+
+        .navbar.deadly {
+            background: var(--deadly-card);
+            border-bottom: 2px solid var(--deadly-accent);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo.cute {
+            color: var(--cute-primary);
+        }
+
+        .logo.deadly {
+            color: var(--deadly-accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link.cute {
+            color: var(--cute-text);
+        }
+
+        .nav-link.cute:hover {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-link.deadly {
+            color: var(--deadly-text);
+        }
+
+        .nav-link.deadly:hover {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn.cute {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .btn.cute:hover {
+            background: #ff5590;
+            transform: translateY(-2px);
+        }
+
+        .btn.deadly {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .btn.deadly:hover {
+            background: #00e68a;
+            transform: translateY(-2px);
+        }
+
+        .btn.small {
+            padding: 0.25rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 2px solid;
+        }
+
+        .btn.outline.cute {
+            border-color: var(--cute-primary);
+            color: var(--cute-primary);
+        }
+
+        .btn.outline.deadly {
+            border-color: var(--deadly-accent);
+            color: var(--deadly-accent);
+        }
+
+        /* Lessons Container */
+        .lessons-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            min-height: calc(100vh - 140px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .lessons-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar */
+        .lesson-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-sidebar.cute {
+            background: white;
+            border: 3px solid var(--cute-primary);
+        }
+
+        .lesson-sidebar.deadly {
+            background: var(--deadly-card);
+            border: 2px solid var(--deadly-accent);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        .lesson-sidebar.cute .sidebar-header {
+            border-bottom: 1px solid var(--cute-secondary);
+        }
+
+        .lesson-sidebar.deadly .sidebar-header {
+            border-bottom: 1px solid #444;
+        }
+
+        .course-progress {
+            margin-bottom: 2rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .lesson-sidebar.deadly .progress-bar {
+            background: #333;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .lesson-sidebar.cute .progress-fill {
+            background: var(--cute-primary);
+        }
+
+        .lesson-sidebar.deadly .progress-fill {
+            background: var(--deadly-accent);
+        }
+
+        .lesson-nav {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lesson-sidebar.cute .section-title {
+            border-bottom: 1px solid var(--cute-secondary);
+            color: var(--cute-primary);
+        }
+
+        .lesson-sidebar.deadly .section-title {
+            border-bottom: 1px solid #444;
+            color: var(--deadly-accent);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.25rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item.cute {
+            color: var(--cute-text);
+            background: var(--cute-bg);
+        }
+
+        .nav-item.deadly {
+            color: var(--deadly-text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item:hover {
+            transform: translateX(5px);
+        }
+
+        .nav-item.cute:hover {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-item.deadly:hover {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .nav-item.active {
+            font-weight: bold;
+        }
+
+        .nav-item.cute.active {
+            background: var(--cute-primary);
+            color: white;
+        }
+
+        .nav-item.deadly.active {
+            background: var(--deadly-accent);
+            color: var(--deadly-bg);
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-status {
+            font-size: 0.8rem;
+        }
+
+        .nav-status.completed {
+            color: var(--cute-success);
+        }
+
+        .lesson-sidebar.deadly .nav-status.completed {
+            color: var(--deadly-success);
+        }
+
+        /* Lesson Content */
+        .lesson-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        .lesson-content.cute .lesson-header {
+            border-bottom: 1px solid var(--cute-secondary);
+        }
+
+        .lesson-content.deadly .lesson-header {
+            border-bottom: 1px solid #444;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumbs a {
+            text-decoration: none;
+        }
+
+        .breadcrumbs.cute a {
+            color: var(--cute-primary);
+        }
+
+        .breadcrumbs.deadly a {
+            color: var(--deadly-accent);
+        }
+
+        .lesson-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .lesson-content.cute .lesson-title {
+            color: var(--cute-primary);
+        }
+
+        .lesson-content.deadly .lesson-title {
+            color: var(--deadly-accent);
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* W3Schools-style Content Layout */
+        .w3-panel {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: var(--radius);
+            border-left: 4px solid;
+        }
+
+        .lesson-content.cute .w3-panel {
+            background: white;
+            border-left-color: var(--cute-primary);
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-content.deadly .w3-panel {
+            background: var(--deadly-card);
+            border-left-color: var(--deadly-accent);
+        }
+
+        .w3-example {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .lesson-content.deadly .w3-example {
+            background: #2a2a3e;
+        }
+
+        .w3-code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+        }
+
+        .w3-note {
+            background: #e7f4ff;
+            border-left: 4px solid #2196F3;
+        }
+
+        .lesson-content.deadly .w3-note {
+            background: #2a2a3e;
+            border-left-color: #1fc0ff;
+        }
+
+        .w3-warning {
+            background: #fff8e1;
+            border-left: 4px solid #FFC107;
+        }
+
+        .lesson-content.deadly .w3-warning {
+            background: #3a2e1e;
+            border-left-color: #ffd166;
+        }
+
+        /* Interactive Elements */
+        .try-it-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .try-it-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .code-editor {
+            background: #1e1e1e;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .editor-header {
+            background: #2d2d2d;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-content {
+            padding: 1rem;
+            min-height: 200px;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .run-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .lesson-content.deadly .quiz-container {
+            background: var(--deadly-card);
+        }
+
+        .quiz-question {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quiz-option.cute {
+            background: var(--cute-bg);
+            border: 2px solid var(--cute-secondary);
+        }
+
+        .quiz-option.deadly {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+        }
+
+        .quiz-option:hover {
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        .cute-footer {
+            background: white;
+            border-top: 3px solid var(--cute-primary);
+            color: var(--cute-text);
+        }
+
+        .deadly-footer {
+            background: var(--deadly-card);
+            border-top: 2px solid var(--deadly-accent);
+            color: var(--deadly-text);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .footer-links a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .lessons-container {
+                padding: 1rem;
+            }
+            
+            .lesson-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-content > div {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Progress indicators */
+        .topic-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .topic-progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+
+        .topic-progress-dot.completed {
+            background: #4CAF50;
+        }
+
+        .topic-progress-dot.active {
+            background: #2196F3;
+            animation: pulse 2s infinite;
+        }
+
+        /* XP Badge */
+        .xp-badge {
+            background: linear-gradient(135deg, #ffd700, #ff9800);
+            color: #333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Completion Celebration */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .celebration-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            animation: pulse 2s infinite;
+        }
+
+        .celebration-content.deadly {
+            background: var(--deadly-card);
+            color: var(--deadly-text);
+            border: 2px solid var(--deadly-accent);
+        }
+
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="cute-theme">
+    <!-- Navigation -->
+    <nav class="navbar cute" id="navbar">
+        <a href="dashboard.html" class="logo cute">
+            <i class="fas fa-code"></i> Python Pathfinder
+        </a>
+        <div class="nav-links">
+            <div class="xp-badge" id="xpBadge">
+                <i class="fas fa-gem"></i> <span id="xpCount">0</span> XP
+            </div>
+            <a href="dashboard.html" class="nav-link cute">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="game.html" class="nav-link cute">
+                <i class="fas fa-gamepad"></i> Play
+            </a>
+            <a href="lessons.html" class="nav-link cute active">
+                <i class="fas fa-book"></i> Lessons
+            </a>
+            <button id="themeToggle" class="btn cute small">
+                <i class="fas fa-moon"></i> Deadly Mode
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="lessons-container">
+        <!-- Sidebar Navigation -->
+        <aside class="lesson-sidebar cute" id="sidebar">
+            <div class="sidebar-header cute">
+                <h2><i class="fas fa-graduation-cap"></i> Learning Path</h2>
+                <p>Master Python Step by Step</p>
+            </div>
+            
+            <div class="course-progress cute">
+                <div class="progress-info">
+                    <span>Course Progress</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <nav class="lesson-nav cute" id="lessonNav">
+                <!-- Navigation items will be populated by JavaScript -->
+            </nav>
+            
+            <div class="sidebar-footer cute">
+                <div class="achievement-count cute">
+                    <i class="fas fa-trophy"></i>
+                    <span id="achievementCount">0 Achievements</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Lesson Content -->
+        <main class="lesson-content cute" id="lessonContent">
+            <!-- Content will be loaded dynamically -->
+            <div id="defaultContent">
+                <div class="lesson-header cute">
+                    <div class="breadcrumbs cute">
+                        <a href="#" onclick="loadDashboard()">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="lessons.html">Lessons</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Welcome to Python Pathfinder</span>
+                    </div>
+                    
+                    <h1 class="lesson-title cute">
+                        <i class="fas fa-rocket"></i> Start Your Coding Journey
+                    </h1>
+                    
+                    <div class="lesson-meta cute">
+                        <span class="meta-item">
+                            <i class="fas fa-star"></i>
+                            <span>Beginner Friendly</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-gem"></i>
+                            <span>Earn XP as you learn</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-info-circle"></i> Welcome Coder!</h2>
+                    <p>Select a lesson from the sidebar to begin your journey. Each lesson includes:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Interactive tutorials with live code examples</li>
+                        <li>Hands-on practice exercises</li>
+                        <li>Knowledge-check quizzes</li>
+                        <li>Real-time progress tracking</li>
+                        <li>XP rewards for completion</li>
+                    </ul>
+                </div>
+
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+                    <div id="welcomeProgress" style="margin-top: 1rem;">
+                        <p>Complete lessons to earn XP and unlock achievements!</p>
+                        <div style="background: #f0f0f0; border-radius: var(--radius); padding: 1rem; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Total Lessons Completed:</span>
+                                <strong id="completedCount">0</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Total XP Earned:</span>
+                                <strong id="totalXP">0</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Current Streak:</span>
+                                <strong id="currentStreak">0 days</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w3-panel cute">
+                    <h2><i class="fas fa-lightbulb"></i> Quick Start Tips</h2>
+                    <div class="w3-note" style="margin-top: 1rem;">
+                        <p><strong>Tip #1:</strong> Complete lessons in order - each builds on previous knowledge</p>
+                    </div>
+                    <div class="w3-note" style="margin-top: 1rem;">
+                        <p><strong>Tip #2:</strong> Try all code examples - hands-on practice is key to learning</p>
+                    </div>
+                    <div class="w3-note" style="margin-top: 1rem;">
+                        <p><strong>Tip #3:</strong> Don't rush - take your time to understand each concept</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="cute-footer" id="footer">
+        <div class="footer-content">
+            <p>Python Pathfinder: Code & Conquer &copy; 2024</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-python-interpreter@latest/dist/interpreter.min.js"></script>
+    <script>
+        // ==================== DATA STORAGE & MANAGEMENT ====================
+        class UserProgress {
+            constructor() {
+                this.STORAGE_KEYS = {
+                    PROGRESS: 'pp_lesson_progress',
+                    XP: 'pp_total_xp',
+                    STREAK: 'pp_streak',
+                    LAST_ACTIVE: 'pp_last_active',
+                    COMPLETED_LESSONS: 'pp_completed_lessons',
+                    COMPLETED_TOPICS: 'pp_completed_topics'
+                };
+                this.loadProgress();
+            }
+
+            loadProgress() {
+                this.progress = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.PROGRESS) || '{}');
+                this.totalXP = parseInt(localStorage.getItem(this.STORAGE_KEYS.XP) || '0');
+                this.streak = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.STREAK) || '{"days": 0, "lastDate": ""}');
+                this.completedLessons = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.COMPLETED_LESSONS) || '[]');
+                this.completedTopics = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.COMPLETED_TOPICS) || '{}');
+                
+                this.updateStreak();
+            }
+
+            saveProgress() {
+                localStorage.setItem(this.STORAGE_KEYS.PROGRESS, JSON.stringify(this.progress));
+                localStorage.setItem(this.STORAGE_KEYS.XP, this.totalXP.toString());
+                localStorage.setItem(this.STORAGE_KEYS.STREAK, JSON.stringify(this.streak));
+                localStorage.setItem(this.STORAGE_KEYS.COMPLETED_LESSONS, JSON.stringify(this.completedLessons));
+                localStorage.setItem(this.STORAGE_KEYS.COMPLETED_TOPICS, JSON.stringify(this.completedTopics));
+            }
+
+            updateStreak() {
+                const today = new Date().toDateString();
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                
+                if (this.streak.lastDate === today) return;
+                
+                if (this.streak.lastDate === yesterday) {
+                    this.streak.days++;
+                } else if (!this.streak.lastDate) {
+                    this.streak.days = 1;
+                } else {
+                    this.streak.days = 1;
+                }
+                
+                this.streak.lastDate = today;
+                this.saveProgress();
+            }
+
+            markTopicComplete(lessonId, topicIndex) {
+                if (!this.completedTopics[lessonId]) {
+                    this.completedTopics[lessonId] = [];
+                }
+                
+                if (!this.completedTopics[lessonId].includes(topicIndex)) {
+                    this.completedTopics[lessonId].push(topicIndex);
+                    this.awardXP(10); // 10 XP per topic
+                    this.saveProgress();
+                    return true;
+                }
+                return false;
+            }
+
+            markLessonComplete(lessonId) {
+                if (!this.completedLessons.includes(lessonId)) {
+                    this.completedLessons.push(lessonId);
+                    this.awardXP(100); // 100 XP for completing lesson
+                    this.saveProgress();
+                    
+                    // Check for achievements
+                    this.checkAchievements();
+                    return true;
+                }
+                return false;
+            }
+
+            awardXP(amount) {
+                this.totalXP += amount;
+                this.saveProgress();
+                
+                // Update UI
+                document.getElementById('xpCount').textContent = this.totalXP;
+                
+                // Check for level up
+                this.checkLevelUp();
+                return this.totalXP;
+            }
+
+            checkLevelUp() {
+                const oldLevel = Math.floor((this.totalXP - 100) / 1000);
+                const newLevel = Math.floor(this.totalXP / 1000);
+                
+                if (newLevel > oldLevel && newLevel > 0) {
+                    this.showNotification(`🎉 Level Up! You reached Level ${newLevel}!`, 'success');
+                }
+            }
+
+            checkAchievements() {
+                const achievements = [];
+                const completedCount = this.completedLessons.length;
+                
+                if (completedCount >= 1 && !this.progress.first_lesson) {
+                    achievements.push({ name: "First Steps", xp: 50 });
+                    this.progress.first_lesson = true;
+                }
+                
+                if (completedCount >= 3 && !this.progress.three_lessons) {
+                    achievements.push({ name: "Quick Learner", xp: 100 });
+                    this.progress.three_lessons = true;
+                }
+                
+                if (completedCount >= 5 && !this.progress.five_lessons) {
+                    achievements.push({ name: "Code Master", xp: 200 });
+                    this.progress.five_lessons = true;
+                }
+                
+                if (this.streak.days >= 3 && !this.progress.three_day_streak) {
+                    achievements.push({ name: "Consistent Coder", xp: 150 });
+                    this.progress.three_day_streak = true;
+                }
+                
+                if (this.streak.days >= 7 && !this.progress.week_streak) {
+                    achievements.push({ name: "Dedicated Developer", xp: 300 });
+                    this.progress.week_streak = true;
+                }
+                
+                achievements.forEach(achievement => {
+                    this.awardXP(achievement.xp);
+                    this.showNotification(`🏆 Achievement Unlocked: ${achievement.name}! +${achievement.xp} XP`, 'success');
+                });
+                
+                this.saveProgress();
+            }
+
+            getProgressPercent() {
+                const totalLessons = Object.keys(LESSON_DATA).length;
+                return Math.round((this.completedLessons.length / totalLessons) * 100);
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                `;
+                
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    background: ${type === 'success' ? '#4CAF50' : '#F44336'};
+                    color: white;
+                    border-radius: var(--radius);
+                    box-shadow: var(--shadow);
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease-out;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            createConfetti() {
+                const colors = currentTheme === 'cute' ? 
+                    ['#ff9ed8', '#a6e3ff', '#ffd166', '#a8e6cf'] :
+                    ['#ff4655', '#1fc0ff', '#00ff9d', '#ffd166'];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: ${8 + Math.random() * 8}px;
+                        height: ${8 + Math.random() * 8}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        top: -20px;
+                        left: ${Math.random() * 100}%;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                        animation: fall ${2 + Math.random() * 3}s linear forwards;
+                        transform: rotate(${Math.random() * 360}deg);
+                        z-index: 9999;
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }
+            }
+        }
+
+        // ==================== LESSON DATA ====================
+        const LESSON_DATA = {
+            python_basics: {
+                id: "python_basics",
+                title: "Python Basics",
+                description: "Learn the fundamentals of Python programming",
+                icon: "fas fa-play-circle",
+                duration: "30-45 min",
+                difficulty: "Beginner",
+                xp: 100,
+                topics: [
+                    {
+                        title: "Introduction to Python",
+                        content: "Python is a high-level, interpreted programming language known for its simplicity and readability.",
+                        example: 'print("Hello, World!")',
+                        quiz: {
+                            question: "What type of programming language is Python?",
+                            options: [
+                                { text: "Compiled", correct: false },
+                                { text: "Interpreted", correct: true },
+                                { text: "Assembly", correct: false },
+                                { text: "Machine Code", correct: false }
+                            ]
+                        }
+                    },
+                    {
+                        title: "Variables",
+                        content: "Variables are used to store data values in Python. You don't need to declare variable types.",
+                        example: 'name = "Python"\nage = 30\nprint(name)\nprint(age)',
+                        practice: {
+                            task: "Create a variable called 'score' and assign it the value 100",
+                            solution: 'score = 100\nprint(score)'
+                        },
+                        quiz: {
+                            question: "How do you create a variable in Python?",
+                            options: [
+                                { text: "var x = 5", correct: false },
+                                { text: "x = 5", correct: true },
+                                { text: "int x = 5", correct: false },
+                                { text: "let x = 5", correct: false }
+                            ]
+                        }
+                    },
+                    {
+                        title: "Data Types",
+                        content: "Python has several built-in data types: integers, floats, strings, booleans, lists, and more.",
+                        example: 'x = 5          # Integer\ny = 3.14       # Float\nname = "John"  # String\nis_true = True # Boolean',
+                        practice: {
+                            task: "Create variables of different data types and print them",
+                            solution: 'num = 42\nprice = 19.99\ntext = "Python"\nflag = True\nprint(num, price, text, flag)'
+                        }
+                    }
+                ]
+            },
+            control_structures: {
+                id: "control_structures",
+                title: "Control Structures",
+                description: "Learn how to control the flow of your Python programs",
+                icon: "fas fa-code",
+                duration: "45-60 min",
+                difficulty: "Beginner",
+                xp: 150,
+                topics: [
+                    {
+                        title: "If Statements",
+                        content: "Use if statements to make decisions in your code.",
+                        example: 'age = 18\nif age >= 18:\n    print("You are an adult")\nelse:\n    print("You are a minor")',
+                        quiz: {
+                            question: "What keyword starts a conditional statement in Python?",
+                            options: [
+                                { text: "when", correct: false },
+                                { text: "if", correct: true },
+                                { text: "check", correct: false },
+                                { text: "condition", correct: false }
+                            ]
+                        }
+                    },
+                    {
+                        title: "Loops",
+                        content: "Loops allow you to execute code repeatedly.",
+                        example: '# For loop\nfor i in range(5):\n    print(i)\n\n# While loop\ncount = 0\nwhile count < 3:\n    print(count)\n    count += 1'
+                    }
+                ]
+            },
+            functions: {
+                id: "functions",
+                title: "Functions & Modules",
+                description: "Learn to create reusable code with functions",
+                icon: "fas fa-function",
+                duration: "60-90 min",
+                difficulty: "Intermediate",
+                xp: 200,
+                topics: [
+                    {
+                        title: "Defining Functions",
+                        content: "Functions are reusable blocks of code that perform specific tasks.",
+                        example: 'def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Alice"))'
+                    }
+                ]
+            },
+            web_basics: {
+                id: "web_basics",
+                title: "HTML & CSS Basics",
+                description: "Learn the fundamentals of web development",
+                icon: "fas fa-html5",
+                duration: "60-90 min",
+                difficulty: "Beginner",
+                xp: 150,
+                topics: [
+                    {
+                        title: "HTML Structure",
+                        content: "HTML provides the structure and content of web pages.",
+                        example: '<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Welcome</h1>\n</body>\n</html>'
+                    }
+                ]
+            }
+        };
+
+        const NAVIGATION = [
+            {
+                section: "Python Fundamentals",
+                icon: "fas fa-book",
+                lessons: ["python_basics", "control_structures", "functions", "data_structures", "oop"]
+            },
+            {
+                section: "Web Development",
+                icon: "fas fa-globe",
+                lessons: ["web_basics", "javascript", "flask", "database"]
+            }
+        ];
+
+        // ==================== APPLICATION STATE ====================
+        let currentTheme = localStorage.getItem('pp_theme') || 'cute';
+        let userProgress = new UserProgress();
+        let currentLessonId = null;
+        let currentTopicIndex = 0;
+
+        // ==================== THEME MANAGEMENT ====================
+        function applyTheme(theme) {
+            currentTheme = theme;
+            document.body.className = theme + '-theme';
+            
+            document.querySelectorAll('.cute, .deadly').forEach(el => {
+                el.classList.remove('cute', 'deadly');
+                el.classList.add(theme);
+            });
+            
+            const toggleBtn = document.getElementById('themeToggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = theme === 'cute' 
+                    ? '<i class="fas fa-moon"></i> Deadly Mode'
+                    : '<i class="fas fa-sun"></i> Cute Mode';
+            }
+            
+            localStorage.setItem('pp_theme', theme);
+        }
+
+        // ==================== LESSON NAVIGATION ====================
+        function initializeLessonNav() {
+            const navContainer = document.getElementById('lessonNav');
+            let navHTML = '';
+            
+            NAVIGATION.forEach(section => {
+                navHTML += `
+                    <div class="nav-section ${currentTheme}">
+                        <h3 class="section-title ${currentTheme}">
+                            <i class="${section.icon}"></i> ${section.section}
+                        </h3>
+                `;
+                
+                section.lessons.forEach(lessonId => {
+                    const lesson = LESSON_DATA[lessonId];
+                    if (!lesson) return;
+                    
+                    const isCompleted = userProgress.completedLessons.includes(lessonId);
+                    const statusIcon = isCompleted ? 'fas fa-check' :
+                                      userProgress.completedTopics[lessonId] ? 'fas fa-spinner fa-spin' :
+                                      'fas fa-play';
+                    const statusClass = isCompleted ? 'completed' : '';
+                    const isActive = currentLessonId === lessonId;
+                    
+                    navHTML += `
+                        <a href="#" class="nav-item ${currentTheme} ${isActive ? 'active' : ''}" 
+                           onclick="loadLesson('${lessonId}')" data-lesson="${lessonId}">
+                            <span class="nav-icon"><i class="${lesson.icon}"></i></span>
+                            <span class="nav-text">${lesson.title}</span>
+                            <span class="nav-status ${statusClass}"><i class="${statusIcon}"></i></span>
+                        </a>
+                    `;
+                });
+                
+                navHTML += '</div>';
+            });
+            
+            navContainer.innerHTML = navHTML;
+            updateProgressUI();
+        }
+
+        function loadLesson(lessonId) {
+            currentLessonId = lessonId;
+            const lesson = LESSON_DATA[lessonId];
+            if (!lesson) return;
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.lesson === lessonId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Generate lesson content
+            let contentHTML = `
+                <div class="lesson-header ${currentTheme}">
+                    <div class="breadcrumbs ${currentTheme}">
+                        <a href="#" onclick="showWelcome()">Lessons</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>${lesson.title}</span>
+                    </div>
+                    
+                    <h1 class="lesson-title ${currentTheme}">
+                        <i class="${lesson.icon}"></i> ${lesson.title}
+                    </h1>
+                    
+                    <div class="lesson-meta ${currentTheme}">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${lesson.duration}</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-star"></i>
+                            <span>${lesson.difficulty}</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-gem"></i>
+                            <span>${lesson.xp} XP</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${userProgress.completedTopics[lessonId]?.length || 0}/${lesson.topics.length} topics</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="topic-progress ${currentTheme}" style="margin-bottom: 2rem;">
+                    ${lesson.topics.map((_, index) => {
+                        const isCompleted = userProgress.completedTopics[lessonId]?.includes(index);
+                        const isActive = index === currentTopicIndex;
+                        return `<div class="topic-progress-dot ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}"></div>`;
+                    }).join('')}
+                </div>
+            `;
+            
+            // Add topics
+            lesson.topics.forEach((topic, index) => {
+                const isActive = index === currentTopicIndex;
+                if (!isActive) return;
+                
+                contentHTML += generateTopicHTML(lessonId, topic, index);
+            });
+            
+            // Add navigation
+            contentHTML += `
+                <div class="lesson-navigation ${currentTheme}" style="display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid ${currentTheme === 'cute' ? 'var(--cute-secondary)' : '#444'};">
+                    <button class="btn outline ${currentTheme}" onclick="prevTopic()" ${currentTopicIndex === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-arrow-left"></i> Previous Topic
+                    </button>
+                    
+                    <button class="btn ${currentTheme}" onclick="completeCurrentTopic()" id="completeTopicBtn">
+                        <i class="fas fa-check"></i> Complete Topic
+                    </button>
+                    
+                    <button class="btn ${currentTheme}" onclick="nextTopic()" ${currentTopicIndex >= lesson.topics.length - 1 ? 'disabled' : ''}>
+                        Next Topic <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn outline ${currentTheme}" onclick="completeLesson()" id="completeLessonBtn">
+                        <i class="fas fa-trophy"></i> Complete Entire Lesson
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('lessonContent').innerHTML = contentHTML;
+            
+            // Update complete button state
+            const isTopicCompleted = userProgress.completedTopics[lessonId]?.includes(currentTopicIndex);
+            if (isTopicCompleted) {
+                document.getElementById('completeTopicBtn').innerHTML = '<i class="fas fa-check-double"></i> Topic Completed';
+                document.getElementById('completeTopicBtn').disabled = true;
+            }
+            
+            const isLessonCompleted = userProgress.completedLessons.includes(lessonId);
+            if (isLessonCompleted) {
+                document.getElementById('completeLessonBtn').innerHTML = '<i class="fas fa-trophy"></i> Lesson Completed';
+                document.getElementById('completeLessonBtn').disabled = true;
+            }
+        }
+
+        function generateTopicHTML(lessonId, topic, index) {
+            const isCompleted = userProgress.completedTopics[lessonId]?.includes(index);
+            
+            let html = `
+                <div class="w3-panel ${currentTheme}">
+                    <h2><i class="fas fa-${isCompleted ? 'check-circle success' : 'circle'}"></i> ${topic.title}</h2>
+                    <p>${topic.content}</p>
+            `;
+            
+            if (topic.example) {
+                html += `
+                    <div class="w3-example">
+                        <h3>Example</h3>
+                        <div class="w3-code">
+${topic.example}
+                        </div>
+                        <button class="try-it-button" onclick="runCode(\`${topic.example.replace(/`/g, '\\`')}\`)">
+                            <i class="fas fa-play"></i> Try it Yourself
+                        </button>
+                    </div>
+                `;
+            }
+            
+            if (topic.practice) {
+                html += `
+                    <div class="w3-panel ${currentTheme}" style="margin-top: 1.5rem;">
+                        <h3><i class="fas fa-laptop-code"></i> Practice Exercise</h3>
+                        <p>${topic.practice.task}</p>
+                        
+                        <div class="code-editor">
+                            <div class="editor-header">
+                                <span>practice.py</span>
+                                <div class="editor-actions">
+                                    <button class="run-button" onclick="runPracticeCode(${index})">
+                                        <i class="fas fa-play"></i> Run
+                                    </button>
+                                    <button class="run-button" style="background: #2196F3;" onclick="showHint(${index})">
+                                        <i class="fas fa-lightbulb"></i> Hint
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="editor-content">
+                                <textarea id="practiceCode${index}" style="width: 100%; height: 150px; background: #1e1e1e; color: white; border: none; padding: 10px; font-family: monospace; resize: vertical;">
+# ${topic.practice.task}
+
+# Your code here
+                                </textarea>
+                            </div>
+                        </div>
+                        
+                        <div id="practiceOutput${index}" style="margin-top: 1rem; padding: 1rem; background: ${currentTheme === 'cute' ? '#f8f9fa' : '#2a2a3e'}; border-radius: var(--radius); min-height: 60px; font-family: monospace; white-space: pre-wrap;">
+                            <strong>Output:</strong> Run your code to see output here...
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (topic.quiz) {
+                html += `
+                    <div class="quiz-container ${currentTheme}" style="margin-top: 1.5rem;">
+                        <h3><i class="fas fa-question-circle"></i> Quick Quiz</h3>
+                        <div class="quiz-question">
+                            ${topic.quiz.question}
+                        </div>
+                        <div class="quiz-options" id="quizOptions${index}">
+                            ${topic.quiz.options.map((option, optIndex) => `
+                                <div class="quiz-option ${currentTheme}" onclick="checkQuizAnswer(this, ${option.correct}, '${lessonId}', ${index})">
+                                    <input type="radio" name="quiz${index}">
+                                    <span>${option.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="quizFeedback${index}" style="margin-top: 1rem; padding: 0.5rem; border-radius: var(--radius); display: none;"></div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        // ==================== TOPIC NAVIGATION ====================
+        function nextTopic() {
+            if (!currentLessonId) return;
+            const lesson = LESSON_DATA[currentLessonId];
+            if (currentTopicIndex < lesson.topics.length - 1) {
+                currentTopicIndex++;
+                loadLesson(currentLessonId);
+            }
+        }
+
+        function prevTopic() {
+            if (currentTopicIndex > 0) {
+                currentTopicIndex--;
+                loadLesson(currentLessonId);
+            }
+        }
+
+        // ==================== CODE EXECUTION ====================
+        function runCode(code) {
+            try {
+                // Using Function constructor for safe execution
+                const func = new Function(code);
+                const output = func();
+                alert(`Output:\n${output || 'Code executed successfully!'}`);
+            } catch (error) {
+                alert(`Error:\n${error.message}`);
+            }
+        }
+
+        function runPracticeCode(topicIndex) {
+            const code = document.getElementById(`practiceCode${topicIndex}`).value;
+            const outputDiv = document.getElementById(`practiceOutput${topicIndex}`);
+            
+            try {
+                // Simple Python code execution simulation
+                const lines = code.split('\n');
+                let output = '';
+                let hasPrint = false;
+                
+                lines.forEach(line => {
+                    if (line.includes('print(')) {
+                        hasPrint = true;
+                        const match = line.match(/print\((.*)\)/);
+                        if (match) {
+                            try {
+                                // Try to evaluate the expression
+                                const result = eval(match[1]);
+                                output += result + '\n';
+                            } catch (e) {
+                                output += '[Printed output]\n';
+                            }
+                        }
+                    }
+                });
+                
+                if (!hasPrint) {
+                    output = 'Code executed (no print statements found)';
+                }
+                
+                outputDiv.innerHTML = `<strong>Output:</strong>\n${output}`;
+                
+                // Check if solution is correct
+                const lesson = LESSON_DATA[currentLessonId];
+                if (lesson?.topics[topicIndex]?.practice?.solution) {
+                    const solution = lesson.topics[topicIndex].practice.solution;
+                    if (code.includes('print') && code.trim().length > 0) {
+                        userProgress.showNotification('✓ Practice code executed successfully!', 'success');
+                    }
+                }
+            } catch (error) {
+                outputDiv.innerHTML = `<strong>Error:</strong>\n${error.message}`;
+            }
+        }
+
+        // ==================== QUIZ HANDLING ====================
+        function checkQuizAnswer(element, isCorrect, lessonId, topicIndex) {
+            const feedback = document.getElementById(`quizFeedback${topicIndex}`);
+            const options = element.parentElement.children;
+            
+            // Reset all options
+            for (let opt of options) {
+                opt.classList.remove('correct', 'incorrect');
+            }
+            
+            // Mark selected option
+            element.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.style.background = isCorrect ? 
+                (currentTheme === 'cute' ? '#d4edda' : '#1a3a2a') :
+                (currentTheme === 'cute' ? '#f8d7da' : '#3a1a1a');
+            feedback.style.borderLeft = isCorrect ? '4px solid #28a745' : '4px solid #dc3545';
+            feedback.innerHTML = isCorrect ? 
+                '<i class="fas fa-check-circle"></i> Correct! Well done!' :
+                '<i class="fas fa-times-circle"></i> Not quite right. Try again!';
+            
+            if (isCorrect) {
+                // Award XP for correct answer
+                userProgress.awardXP(15);
+                
+                // Auto-complete topic if practice was also done
+                setTimeout(() => {
+                    completeCurrentTopic();
+                }, 1500);
+            }
+        }
+
+        // ==================== PROGRESS MANAGEMENT ====================
+        function completeCurrentTopic() {
+            if (!currentLessonId) return;
+            
+            const wasNew = userProgress.markTopicComplete(currentLessonId, currentTopicIndex);
+            if (wasNew) {
+                userProgress.showNotification(`✓ Topic completed! +10 XP`, 'success');
+                
+                // Update UI
+                const btn = document.getElementById('completeTopicBtn');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-check-double"></i> Topic Completed';
+                    btn.disabled = true;
+                }
+                
+                // Update progress dots
+                updateProgressUI();
+                
+                // Move to next topic if available
+                const lesson = LESSON_DATA[currentLessonId];
+                if (currentTopicIndex < lesson.topics.length - 1) {
+                    setTimeout(() => {
+                        nextTopic();
+                    }, 1000);
+                }
+            }
+        }
+
+        function completeLesson() {
+            if (!currentLessonId) return;
+            
+            // Complete all topics first
+            const lesson = LESSON_DATA[currentLessonId];
+            for (let i = 0; i < lesson.topics.length; i++) {
+                userProgress.markTopicComplete(currentLessonId, i);
+            }
+            
+            const wasNew = userProgress.markLessonComplete(currentLessonId);
+            if (wasNew) {
+                // Show celebration
+                showCompletionCelebration(currentLessonId);
+                
+                // Update UI
+                const btn = document.getElementById('completeLessonBtn');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-trophy"></i> Lesson Completed';
+                    btn.disabled = true;
+                }
+                
+                userProgress.showNotification(`🎉 Lesson completed! +${lesson.xp} XP earned!`, 'success');
+                updateProgressUI();
+            }
+        }
+
+        function showCompletionCelebration(lessonId) {
+            const lesson = LESSON_DATA[lessonId];
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'celebration-overlay';
+            overlay.innerHTML = `
+                <div class="celebration-content ${currentTheme}">
+                    <div class="celebration-icon">🎉</div>
+                    <h2>Lesson Completed!</h2>
+                    <p>You've successfully completed:</p>
+                    <h3>${lesson.title}</h3>
+                    <div style="margin: 2rem 0;">
+                        <div style="background: ${currentTheme === 'cute' ? '#f0f0f0' : '#2a2a2a'}; padding: 1rem; border-radius: var(--radius); margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>XP Earned:</span>
+                                <strong>+${lesson.xp} XP</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                                <span>Total XP:</span>
+                                <strong>${userProgress.totalXP} XP</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn ${currentTheme}" onclick="this.parentElement.parentElement.remove()">
+                        Continue Learning
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Add confetti
+            userProgress.createConfetti();
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                if (overlay.parentElement) {
+                    overlay.remove();
+                }
+            }, 5000);
+        }
+
+        // ==================== UI UPDATES ====================
+        function updateProgressUI() {
+            // Update progress bar
+            const progressPercent = userProgress.getProgressPercent();
+            document.getElementById('progressPercent').textContent = `${progressPercent}%`;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            
+            // Update XP
+            document.getElementById('xpCount').textContent = userProgress.totalXP;
+            
+            // Update achievements count
+            const achievementCount = Object.keys(userProgress.progress).filter(key => 
+                userProgress.progress[key] === true
+            ).length;
+            document.getElementById('achievementCount').textContent = `${achievementCount} Achievements`;
+            
+            // Update welcome screen stats
+            document.getElementById('completedCount').textContent = userProgress.completedLessons.length;
+            document.getElementById('totalXP').textContent = userProgress.totalXP;
+            document.getElementById('currentStreak').textContent = `${userProgress.streak.days} days`;
+        }
+
+        function showWelcome() {
+            currentLessonId = null;
+            currentTopicIndex = 0;
+            
+            document.getElementById('lessonContent').innerHTML = document.getElementById('defaultContent').innerHTML;
+            updateProgressUI();
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        function showHint(topicIndex) {
+            const lesson = LESSON_DATA[currentLessonId];
+            if (lesson?.topics[topicIndex]?.practice?.solution) {
+                const solution = lesson.topics[topicIndex].practice.solution;
+                const hint = solution.split('\n')[0]; // First line as hint
+                userProgress.showNotification(`💡 Hint: ${hint}`, 'info');
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply theme
+            applyTheme(currentTheme);
+            
+            // Setup theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                applyTheme(currentTheme === 'cute' ? 'deadly' : 'cute');
+                if (currentLessonId) {
+                    loadLesson(currentLessonId);
+                }
+            });
+            
+            // Initialize navigation
+            initializeLessonNav();
+            
+            // Update UI with current progress
+            updateProgressUI();
+            
+            // Setup welcome screen stats
+            showWelcome();
+        });
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .fa-spin {
+                animation: spin 1s linear infinite;
+            }
+            
+            .quiz-option.correct {
+                background: #d4edda !important;
+                border-color: #c3e6cb !important;
+            }
+            
+            .quiz-option.incorrect {
+                background: #f8d7da !important;
+                border-color: #f5c6cb !important;
+            }
+            
+            .lesson-content.deadly .quiz-option.correct {
+                background: #1a3a2a !important;
+                border-color: #28a745 !important;
+            }
+            
+            .lesson-content.deadly .quiz-option.incorrect {
+                background: #3a1a1a !important;
+                border-color: #dc3545 !important;
+            }
+            
+            .btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            .success {
+                color: #4CAF50;
+            }
+            
+            .info {
+                color: #2196F3;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
